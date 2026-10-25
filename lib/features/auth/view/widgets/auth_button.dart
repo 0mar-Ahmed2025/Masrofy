@@ -8,7 +8,6 @@ import 'package:masrofy/core/widgets/custom_buttons.dart';
 
 class AuthBtn extends StatelessWidget {
   const AuthBtn({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +15,7 @@ class AuthBtn extends StatelessWidget {
       text: "التسجيل من خلال جوجل",
       variant: ButtonVariant.outlined,
       onPressed: () {
-        context.go(AppRoutes.home);
+        context.go(AppRoutes.homeScreen);
       },
       icon: FaIcon(FontAwesomeIcons.google, size: AppSizes.iconM),
       textStyle: context.textTheme.titleMedium,
