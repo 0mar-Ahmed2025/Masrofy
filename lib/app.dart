@@ -2,6 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:masrofy/core/routes/app_routes.dart';
+import 'package:masrofy/core/routes/routes.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
 import 'package:masrofy/core/themes/app_theme.dart';
 import 'package:masrofy/core/themes/theme_mode_provider.dart';
@@ -19,7 +22,7 @@ class MyApp extends ConsumerWidget {
       child: ScreenUtilInit(
         designSize: const Size(360, 690),
         builder: (context, child) {
-          return MaterialApp(
+          return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Masrofy',
             theme: AppTheme.light,
@@ -27,9 +30,8 @@ class MyApp extends ConsumerWidget {
             locale: context.locale,
             supportedLocales: context.supportedLocales,
             localizationsDelegates: context.localizationDelegates,
-
+            routerConfig: appRouter,
             themeMode: themeMode,
-            home: HomeScreen(),
           );
         },
       ),
@@ -75,10 +77,26 @@ class HomeScreen extends ConsumerWidget {
                   );
                 },
               ),
+              SizedBox(height: AppSizes.xl),
+              CustomButton(
+                text: 'Go To Settings',
+                onPressed: () {
+                  context.push(AppRoutes.settings);
+                },
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: Text("Settings Screen")));
   }
 }
