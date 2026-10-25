@@ -64,6 +64,7 @@ class AppColors {
   // Extra Colors
   // ===========================
 
+  static const Color white = Color.fromARGB(255, 252, 252, 252);
   static const Color purple = Color(0xFF8B5CF6);
   static const Color orange = Color(0xFFF97316);
   static const Color blue = Color(0xFF3B82F6);
