@@ -21,7 +21,9 @@ class AppSizes {
   // =========================
   // Screen Padding
   // =========================
+
   static double get screenPadding => 16.w;
+  static double get screenPaddingAll => 16.w;
   static double get screenPaddingLarge => 24.w;
 
   // =========================
