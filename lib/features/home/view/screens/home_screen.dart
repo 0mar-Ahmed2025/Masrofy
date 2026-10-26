@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:masrofy/core/extensions/build_context.dart';
+import 'package:masrofy/core/widgets/custom_app_scaffold.dart';
 import 'package:masrofy/features/home/view/tabs/expenses_tab.dart';
 import 'package:masrofy/features/home/view/tabs/home_tab.dart';
 import 'package:masrofy/features/home/view/tabs/more_tab.dart';
@@ -25,10 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(index: _currentNavIndex, children: _tabs),
-      ),
+    return AppScaffold(
+      isDark: context.isDarkMode,
       bottomNavigationBar: HomeBottomNavigation(
         currentIndex: _currentNavIndex,
         onTap: (index) {
@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
+      child: IndexedStack(index: _currentNavIndex, children: _tabs),
     );
   }
 }

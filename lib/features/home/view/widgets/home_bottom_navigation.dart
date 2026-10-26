@@ -98,9 +98,8 @@ class HomeBottomNavigation extends StatelessWidget {
               }
 
               // Normal nav item
-              return GestureDetector(
+              return InkWell(
                 onTap: () => onTap(index),
-                behavior: HitTestBehavior.opaque,
                 child: SizedBox(
                   width: 60.w,
                   child: Column(

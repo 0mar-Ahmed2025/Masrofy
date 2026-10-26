@@ -3,10 +3,16 @@ import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/themes/app_colors.dart';
 
 class AppScaffold extends StatelessWidget {
-  const AppScaffold({super.key, required this.isDark, required this.child});
+  const AppScaffold({
+    super.key,
+    required this.isDark,
+    required this.child,
+    this.bottomNavigationBar,
+  });
 
   final bool isDark;
   final Widget child;
+  final Widget? bottomNavigationBar;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +37,7 @@ class AppScaffold extends StatelessWidget {
         ),
         child: child.safeArea(),
       ),
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }
