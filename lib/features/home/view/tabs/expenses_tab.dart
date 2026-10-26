@@ -91,7 +91,6 @@ class ExpensesTab extends StatelessWidget {
           // Summary Card
           const _ExpensesSummaryCard(),
           AppSizes.m.verticalSpace,
-
           // List of groups
           ListView.builder(
             shrinkWrap: true,
@@ -101,7 +100,6 @@ class ExpensesTab extends StatelessWidget {
               final group = groups[groupIndex];
               final date = group['date'] as String;
               final items = group['items'] as List<Map<String, dynamic>>;
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -114,7 +112,6 @@ class ExpensesTab extends StatelessWidget {
                           : AppColors.textSecondaryLight,
                       fontWeight: FontWeight.bold,
                     ),
-                    textAlign: TextAlign.right,
                   ).paddingAll(AppSizes.s),
 
                   // Group Card Wrapper
@@ -270,39 +267,35 @@ class _TransactionItem extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSizes.m, vertical: 12.h),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Right side: Icon + Text info
-          Row(
+          Container(
+            width: 40.w,
+            height: 40.h,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: AppSizes.iconS),
+          ),
+          AppSizes.m.horizontalSpace,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 40.w,
-                height: 40.h,
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+              Text(
+                title,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Icon(icon, color: iconColor, size: AppSizes.iconS),
               ),
-              AppSizes.m.horizontalSpace,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  4.verticalSpace,
-                  Text(
-                    subtitle,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
+              4.verticalSpace,
+              Text(
+                subtitle,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
               ),
             ],
           ),
