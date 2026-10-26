@@ -17,6 +17,8 @@ class HomeAppBar extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            AppSizes.s.verticalSpace,
+
             Text('مرحباً، عمر', style: context.textTheme.titleLarge),
             AppSizes.s.verticalSpace,
             Text(
