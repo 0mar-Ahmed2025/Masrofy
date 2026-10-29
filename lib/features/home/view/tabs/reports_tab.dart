@@ -179,7 +179,7 @@ class _StatCard extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
@@ -191,13 +191,15 @@ class _StatCard extends StatelessWidget {
           ),
           AppSizes.s.verticalSpace,
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
+              Text(amount, style: context.textTheme.titleLarge),
+              3.w.horizontalSpace,
               if (!isPercentage)
                 Text(
-                  'EGP ',
+                  'ج . م ',
                   style: context.textTheme.bodySmall?.copyWith(
                     color: isDark
                         ? AppColors.textSecondaryDark
@@ -205,13 +207,12 @@ class _StatCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              Text(amount, style: context.textTheme.titleLarge),
             ],
           ),
           if (changeText != null) ...[
             AppSizes.s.verticalSpace,
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   changeText!,

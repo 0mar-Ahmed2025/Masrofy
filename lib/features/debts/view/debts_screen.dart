@@ -17,12 +17,12 @@ class DebtsScreen extends StatefulWidget {
 }
 
 class _DebtsScreenState extends State<DebtsScreen> {
-  int _selectedTabIndex = 0; // 0: كل الديون, 1: متبقي, 2: مسددة
+  int _selectedTabIndex = 0;
 
   final List<Map<String, dynamic>> _allDebts = [
     {
       'title': 'قرض شخصي',
-      'subtitle': 'الأهلي',
+      'subtitle': 'البنك الأهلي',
       'remaining': '3,000',
       'total': '6,000',
       'percentage': 60,
@@ -77,7 +77,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             double.parse((debt['remaining'] as String).replaceAll(',', '')) ==
                 0;
       }
-      return !debt['isPaid']; // Default Tab 0 (كل الديون) shows active debts
+      return !debt['isPaid'];
     }).toList();
 
     return AppScaffold(
@@ -335,7 +335,7 @@ class _DebtCard extends StatelessWidget {
             children: [
               // Title & Subtitle (Right)
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: context.textTheme.titleMedium),
                   4.verticalSpace,
@@ -354,17 +354,17 @@ class _DebtCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$remaining EGP',
-                    style: context.textTheme.titleMedium?.copyWith(),
-                  ),
-                  2.verticalSpace,
-                  Text(
-                    'تبقي',
+                    'متبقي',
                     style: context.textTheme.labelSmall?.copyWith(
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
                     ),
+                  ),
+                  2.verticalSpace,
+                  Text(
+                    '$remaining EGP',
+                    style: context.textTheme.titleMedium?.copyWith(),
                   ),
                 ],
               ),
@@ -408,17 +408,18 @@ class _DebtCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$total EGP',
-                    style: context.textTheme.bodySmall?.copyWith(
+                    'الإجمالي',
+                    style: context.textTheme.labelSmall?.copyWith(
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
                     ),
                   ),
                   2.verticalSpace,
+
                   Text(
-                    'الإجمالي',
-                    style: context.textTheme.labelSmall?.copyWith(
+                    '$total EGP',
+                    style: context.textTheme.bodySmall?.copyWith(
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
