@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:go_router/go_router.dart';
 import 'package:masrofy/core/extensions/build_context.dart';
 import 'package:masrofy/core/extensions/num_extension.dart';
 import 'package:masrofy/core/extensions/widget_extension.dart';
@@ -8,77 +9,38 @@ import 'package:masrofy/core/themes/app_colors.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
 import 'package:masrofy/core/widgets/custom_app_bar.dart';
 import 'package:masrofy/core/widgets/custom_app_scaffold.dart';
+import 'package:masrofy/features/debts/controllers/debts_controllers.dart';
+import 'package:masrofy/features/debts/data/models/debt_model.dart';
+import 'package:masrofy/features/debts/view/widgets/debt_card.dart';
+import 'package:masrofy/features/debts/view/widgets/debts_form.dart';
+import 'package:masrofy/features/debts/view/widgets/debts_summery_card.dart';
 
-class DebtsScreen extends StatefulWidget {
+class DebtsScreen extends ConsumerStatefulWidget {
   const DebtsScreen({super.key});
 
   @override
-  State<DebtsScreen> createState() => _DebtsScreenState();
+  ConsumerState<DebtsScreen> createState() => _DebtsPageState();
 }
 
-class _DebtsScreenState extends State<DebtsScreen> {
+class _DebtsPageState extends ConsumerState<DebtsScreen> {
   int _selectedTabIndex = 0;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _creditorController = TextEditingController();
+  final TextEditingController _totalController = TextEditingController();
+  final TextEditingController _paidController = TextEditingController();
 
-  final List<Map<String, dynamic>> _allDebts = [
-    {
-      'title': 'قرض شخصي',
-      'subtitle': 'البنك الأهلي',
-      'remaining': '3,000',
-      'total': '6,000',
-      'percentage': 60,
-      'progress': 0.6,
-      'color': AppColors.expense,
-      'isPaid': false,
-    },
-    {
-      'title': 'بطاقة الائتمان',
-      'subtitle': 'البنك التجاري الدولي',
-      'remaining': '1,250',
-      'total': '2,000',
-      'percentage': 37,
-      'progress': 0.37,
-      'color': AppColors.blue,
-      'isPaid': false,
-    },
-    {
-      'title': 'دين لصديق',
-      'subtitle': 'أحمد محمد',
-      'remaining': '950',
-      'total': '1,000',
-      'percentage': 95,
-      'progress': 0.95,
-      'color': AppColors.success,
-      'isPaid': false,
-    },
-    // Mock paid debt for demonstrating tab filtering
-    {
-      'title': 'دين لـ محمد',
-      'subtitle': 'مسترد كامل',
-      'remaining': '0',
-      'total': '2,000',
-      'percentage': 100,
-      'progress': 1.0,
-      'color': AppColors.success,
-      'isPaid': true,
-    },
-  ];
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _creditorController.dispose();
+    _totalController.dispose();
+    _paidController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final iconColor = context.colorScheme.onSurface;
-
-    // Filter debts based on selected tab
-    final filteredDebts = _allDebts.where((debt) {
-      if (_selectedTabIndex == 1) {
-        return !debt['isPaid'] &&
-            double.parse((debt['remaining'] as String).replaceAll(',', '')) > 0;
-      } else if (_selectedTabIndex == 2) {
-        return debt['isPaid'] ||
-            double.parse((debt['remaining'] as String).replaceAll(',', '')) ==
-                0;
-      }
-      return !debt['isPaid'];
-    }).toList();
+    final debtsState = ref.watch(debtsControllerProvider);
 
     return AppScaffold(
       isDark: context.isDarkMode,
@@ -86,76 +48,226 @@ class _DebtsScreenState extends State<DebtsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Row
-            CustomAppBar(title: "الديون"),
-
+            CustomAppBar(title: 'الديون', onAddPressed: _showAddDebtSheet),
             AppSizes.m.verticalSpace,
+            debtsState.when(
+              data: (List<DebtModel> debts) {
+                final filteredDebts = _selectedTabIndex == 1
+                    ? debts.where((debt) => debt.isPaid).toList()
+                    : debts.where((debt) => !debt.isPaid).toList();
 
-            // Red Coral Gradient Card
-            const _DebtsSummaryCard(),
-            AppSizes.l.verticalSpace,
+                final totalRemaining = debts
+                    .where((debt) => !debt.isPaid)
+                    .fold<double>(0, (sum, debt) => sum + debt.remainingAmount);
 
-            // Custom tab bar
-            Row(
-              textDirection: TextDirection.rtl,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildTabItem('كل الديون', index: 0),
-                _buildTabItem('متبقي', index: 1),
-                _buildTabItem('مسددة', index: 2),
-              ],
-            ),
-            AppSizes.l.verticalSpace,
+                final totalAmount = debts.fold<double>(
+                  0,
+                  (sum, debt) => sum + debt.totalAmount,
+                );
 
-            // List of Debts
-            if (filteredDebts.isEmpty)
-              Center(
-                child: Column(
+                final paidPercentage = totalAmount == 0
+                    ? 0.0
+                    : ((totalAmount -
+                              debts.fold<double>(
+                                0,
+                                (sum, debt) => sum + debt.remainingAmount,
+                              )) /
+                          totalAmount *
+                          100);
+
+                return Column(
                   children: [
-                    AppSizes.xxl.verticalSpace,
-                    Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: AppSizes.iconXL,
-                      color: AppColors.grey400,
+                    DebtsSummaryCard(
+                      totalRemaining: totalRemaining,
+                      paidPercentage: paidPercentage,
                     ),
-                    AppSizes.m.verticalSpace,
-                    Text(
-                      'لا توجد ديون حالياً',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.grey500,
+                    AppSizes.l.verticalSpace,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTabItem('نشطة', index: 0),
+                        AppSizes.l.horizontalSpace,
+                        _buildTabItem('مسددة', index: 1),
+                      ],
+                    ),
+
+                    AppSizes.l.verticalSpace,
+                    if (filteredDebts.isEmpty)
+                      Center(
+                        child: Column(
+                          children: [
+                            AppSizes.xxl.verticalSpace,
+                            Icon(
+                              Icons.account_balance_wallet_outlined,
+                              size: AppSizes.iconXL,
+                              color: AppColors.grey400,
+                            ),
+                            AppSizes.m.verticalSpace,
+                            Text(
+                              'لا توجد ديون هنا',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: AppColors.grey500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredDebts.length,
+                        separatorBuilder: (context, index) =>
+                            AppSizes.m.verticalSpace,
+                        itemBuilder: (context, index) {
+                          final debt = filteredDebts[index];
+                          return DebtCard(
+                            debt: debt,
+                            onTap: () => _showDebtFormSheet(debt: debt),
+                          );
+                        },
                       ),
-                    ),
                   ],
+                );
+              },
+              loading: () => Center(
+                child: Padding(
+                  padding: 24.allPadding,
+                  child: const CircularProgressIndicator(),
                 ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: filteredDebts.length,
-                separatorBuilder: (context, index) => AppSizes.m.verticalSpace,
-                itemBuilder: (context, index) {
-                  final debt = filteredDebts[index];
-                  return _DebtCard(
-                    title: debt['title'] as String,
-                    subtitle: debt['subtitle'] as String,
-                    remaining: debt['remaining'] as String,
-                    total: debt['total'] as String,
-                    percentage: debt['percentage'] as int,
-                    progressValue: debt['progress'] as double,
-                    progressColor: debt['color'] as Color,
-                  );
-                },
               ),
+              error: (error, stackTrace) => Center(
+                child: Padding(
+                  padding: 24.allPadding,
+                  child: Text(
+                    'تعذر تحميل الديون',
+                    style: context.textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+            ),
           ],
         ).paddingAll(AppSizes.screenPadding),
       ),
     );
   }
 
+  Future<void> _showAddDebtSheet() async {
+    await _showDebtFormSheet();
+  }
+
+  Future<void> _showDebtFormSheet({DebtModel? debt}) async {
+    final isDark = context.isDarkMode;
+    final isEditing = debt != null;
+
+    _titleController.text = debt?.title ?? '';
+    _creditorController.text = debt?.creditor ?? '';
+    _totalController.text = debt?.totalAmount.toStringAsFixed(0) ?? '';
+    _paidController.text = debt?.paidAmount.toStringAsFixed(0) ?? '';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return DebtFormSheet(
+          isDark: isDark,
+          isEditing: isEditing,
+          titleController: _titleController,
+          creditorController: _creditorController,
+          totalController: _totalController,
+          paidController: _paidController,
+          onDelete: isEditing
+              ? () async {
+                  context.pop();
+                  await _deleteDebt(debt);
+                }
+              : null,
+          onSave: () async {
+            final title = _titleController.text.trim();
+            final creditor = _creditorController.text.trim();
+            final total = double.tryParse(_totalController.text) ?? 0;
+            final paid = double.tryParse(_paidController.text) ?? 0;
+
+            if (title.isEmpty || total <= 0) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('أدخل عنوانًا صحيحًا ومبلغًا أكبر من صفر'),
+                ),
+              );
+              return;
+            }
+
+            final updatedDebt = DebtModel(
+              id: debt?.id ?? '',
+              title: title,
+              creditor: creditor,
+              totalAmount: total,
+              paidAmount: paid,
+            );
+
+            try {
+              final notifier = ref.read(debtsControllerProvider.notifier);
+              if (isEditing) {
+                await notifier.updateDebt(updatedDebt);
+              } else {
+                await notifier.addDebt(updatedDebt);
+              }
+              await notifier.refreshDebts();
+
+              if (!mounted) return;
+              _titleController.clear();
+              _creditorController.clear();
+              _totalController.clear();
+              _paidController.clear();
+              context.pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isEditing
+                        ? 'تم تعديل الدين بنجاح'
+                        : 'تمت إضافة الدين بنجاح',
+                  ),
+                ),
+              );
+            } catch (error) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isEditing
+                        ? 'حدث خطأ أثناء تعديل الدين'
+                        : 'حدث خطأ أثناء إضافة الدين',
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteDebt(DebtModel debt) async {
+    try {
+      await ref.read(debtsControllerProvider.notifier).deleteDebt(debt.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم حذف الدين بنجاح')));
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء حذف الدين')));
+    }
+  }
+
   Widget _buildTabItem(String label, {required int index}) {
     final isSelected = _selectedTabIndex == index;
     final isDark = context.isDarkMode;
+    final activeColor = AppColors.expense;
 
     return GestureDetector(
       onTap: () => setState(() => _selectedTabIndex = index),
@@ -166,7 +278,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             label,
             style: context.textTheme.titleSmall?.copyWith(
               color: isSelected
-                  ? AppColors.expense
+                  ? activeColor
                   : (isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondaryLight),
@@ -175,259 +287,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
           ),
           AppSizes.xs.verticalSpace,
           Container(
-            width: 60.w,
+            width: 70.w,
             height: 2.h,
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.expense : Colors.transparent,
+              color: isSelected ? activeColor : Colors.transparent,
               borderRadius: 1.r.radius,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DebtsSummaryCard extends StatelessWidget {
-  const _DebtsSummaryCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: 16.allPadding,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF87171), Color(0xFFEF4444)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: AppSizes.rXL.radius,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.expense.withValues(alpha: 0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left side: Text details
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'إجمالي الديون',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              AppSizes.xs.verticalSpace,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '5,200',
-                    style: context.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  AppSizes.s.horizontalSpace,
-                  Text(
-                    'EGP',
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              AppSizes.s.verticalSpace,
-              Text(
-                'متبقي',
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
-              ),
-            ],
-          ),
-          // Right side: Circular progress indicator
-          Column(
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 54.w,
-                    height: 54.h,
-                    child: CircularProgressIndicator(
-                      value: 0.45,
-                      strokeWidth: 5.w,
-                      color: Colors.white,
-                      backgroundColor: Colors.white.withValues(alpha: 0.25),
-                    ),
-                  ),
-                  Text(
-                    '45%',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              AppSizes.s.verticalSpace,
-              Text(
-                'تم السداد',
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DebtCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String remaining;
-  final String total;
-  final int percentage;
-  final double progressValue;
-  final Color progressColor;
-
-  const _DebtCard({
-    required this.title,
-    required this.subtitle,
-    required this.remaining,
-    required this.total,
-    required this.percentage,
-    required this.progressValue,
-    required this.progressColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
-    return Container(
-      padding: 16.allPadding,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.cardDark : Colors.white,
-        borderRadius: AppSizes.rL.radius,
-        border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Top Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Title & Subtitle (Right)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: context.textTheme.titleMedium),
-                  4.verticalSpace,
-                  Text(
-                    subtitle,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-              // Remaining (Left)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'متبقي',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  2.verticalSpace,
-                  Text(
-                    '$remaining EGP',
-                    style: context.textTheme.titleMedium?.copyWith(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          12.verticalSpace,
-          // Bottom Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Progress Bar & Percentage (Right)
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(
-                      '$percentage%',
-                      style: context.textTheme.labelSmall?.copyWith(),
-                    ),
-                    8.horizontalSpace,
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: 10.r.radius,
-                        child: LinearProgressIndicator(
-                          value: progressValue,
-                          minHeight: 6.h,
-                          backgroundColor: isDark
-                              ? AppColors.borderDark
-                              : AppColors.grey100,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            progressColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              24.horizontalSpace,
-              // Total Amount (Left)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'الإجمالي',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  2.verticalSpace,
-
-                  Text(
-                    '$total EGP',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
         ],
       ),
