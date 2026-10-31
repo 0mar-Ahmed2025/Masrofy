@@ -44,11 +44,12 @@ class AuthRepo {
     } catch (e) {
       log(e.toString());
     }
+    return null;
   }
 
   // get user state -> is auth or not
   // get user data
-  User get user => _firebaseAuth.currentUser!;
+  User? get currentUser => _firebaseAuth.currentUser!;
 
   CollectionReference<Map<String, dynamic>> get _userCollection =>
       _firebaseFirestore.collection('users');

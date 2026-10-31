@@ -10,7 +10,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await GoogleSignIn.instance.initialize();
+  await GoogleSignIn.instance.initialize(
+    serverClientId:
+        '667374987549-u8s518te5drpcjneanck84fcfree8tne.apps.googleusercontent.com',
+  );
   await EasyLocalization.ensureInitialized();
   runApp(ProviderScope(child: const MyApp()));
 }
