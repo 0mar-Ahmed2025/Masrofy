@@ -6,8 +6,8 @@ import 'package:masrofy/core/extensions/num_extension.dart';
 import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/themes/app_colors.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
+import 'package:masrofy/core/widgets/custom_app_bar.dart';
 import 'package:masrofy/core/widgets/custom_app_scaffold.dart';
-import 'package:masrofy/features/income/view/income_screen.dart';
 
 class DebtsScreen extends StatefulWidget {
   const DebtsScreen({super.key});

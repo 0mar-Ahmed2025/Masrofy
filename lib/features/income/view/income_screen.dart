@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:masrofy/core/constants/app_assets.dart';
 import 'package:masrofy/core/extensions/build_context.dart';
 import 'package:masrofy/core/extensions/num_extension.dart';
 import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/themes/app_colors.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
+import 'package:masrofy/core/widgets/custom_app_bar.dart';
 import 'package:masrofy/core/widgets/custom_app_scaffold.dart';
 
 class IncomeScreen extends StatelessWidget {
@@ -82,37 +82,6 @@ class IncomeScreen extends StatelessWidget {
           ],
         ).paddingAll(AppSizes.screenPadding),
       ),
-    );
-  }
-}
-
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key, required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          onPressed: () => context.pop(),
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: context.colorScheme.onSurface,
-            size: AppSizes.iconM,
-          ),
-        ),
-        Text(title, style: context.textTheme.titleLarge),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(
-            Icons.add_rounded,
-            color: context.colorScheme.onSurface,
-            size: AppSizes.iconM,
-          ),
-        ),
-      ],
     );
   }
 }
