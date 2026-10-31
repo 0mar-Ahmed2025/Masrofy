@@ -25,7 +25,7 @@ class HomeBottomNavigation extends StatelessWidget {
       _NavItem(
         icon: Icons.insert_chart_outlined_rounded,
         activeIcon: Icons.insert_chart_rounded,
-        label: 'التقارير',
+        label: 'التقاري',
       ),
       _NavItem(
         icon: Icons.add,
@@ -98,8 +98,9 @@ class HomeBottomNavigation extends StatelessWidget {
               }
 
               // Normal nav item
-              return InkWell(
+              return GestureDetector(
                 onTap: () => onTap(index),
+                behavior: HitTestBehavior.opaque,
                 child: SizedBox(
                   width: 60.w,
                   child: Column(

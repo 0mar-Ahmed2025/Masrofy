@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 extension WidgetExtension on Widget {
   Widget paddingAll(double value) {
-    return Padding(padding: REdgeInsets.all(value), child: this);
+    return Padding(padding: EdgeInsets.all(value), child: this);
   }
 
   Widget paddingHorizontal(double value) {

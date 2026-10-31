@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:masrofy/core/constants/app_assets.dart';
 import 'package:masrofy/core/extensions/build_context.dart';
@@ -6,12 +7,16 @@ import 'package:masrofy/core/extensions/num_extension.dart';
 import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/themes/app_colors.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
+import 'package:masrofy/features/home/controllers/statistics_providers.dart';
 
-class SummeryCard extends StatelessWidget {
+class SummeryCard extends ConsumerWidget {
   const SummeryCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final incomce = ref.watch(thisMonthIncomProvider);
+    final expense = ref.watch(thisMonthExpnseProvider);
+    final balance = ref.watch(thisMonthBalanceProvider);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -32,28 +37,33 @@ class SummeryCard extends StatelessWidget {
             child: InkWell(
               onTap: () {},
               borderRadius: AppSizes.rS.radius,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("الملخص المالي", style: context.textTheme.titleMedium),
-                  AppSizes.s.horizontalSpace,
-                  Icon(
-                    // _obscureBalances
-                    //     ? Icons.visibility_off_outlined
-                    // :
-                    Icons.visibility_outlined,
-                    color: Colors.white,
-                    size: AppSizes.iconS,
-                  ),
-                ],
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("الملخص المالي", style: context.textTheme.titleMedium),
+                    AppSizes.s.horizontalSpace,
+                    Icon(
+                      // _obscureBalances
+                      //     ? Icons.visibility_off_outlined
+                      // :
+                      Icons.visibility_outlined,
+                      color: Colors.white,
+                      size: AppSizes.iconS,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           AppSizes.s.verticalSpace,
+
           Row(
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
                   Text(
                     "إجمالي الرصيد",
@@ -69,8 +79,7 @@ class SummeryCard extends StatelessWidget {
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            '12,450',
-                            // formatAmount('12,450'),
+                            balance.formatAmount,
                             style: context.textTheme.displayMedium?.copyWith(
                               color: Colors.white,
                             ),
@@ -90,22 +99,21 @@ class SummeryCard extends StatelessWidget {
                   AppSizes.xs.verticalSpace,
                   // Thin horizontal divider
                   Container(
-                    height: 0.5.h,
-                    width: 165.w,
+                    height: 0.5,
                     color: Colors.white.withValues(alpha: 0.3),
                   ),
-                  AppSizes.xs.verticalSpace,
+                  AppSizes.s.verticalSpace,
                   Row(
                     children: [
                       CardSubTitle(
                         title: "إجمالي الدخل",
-                        value: "27,800",
+                        value: incomce.formatAmount,
                         color: AppColors.primaryLight,
                       ),
                       AppSizes.m.horizontalSpace,
                       // Vertical Divider
                       Container(
-                        width: 0.5.w,
+                        width: 0.5,
                         height: 35.h,
                         color: Colors.white.withValues(alpha: 0.3),
                       ),
@@ -113,7 +121,7 @@ class SummeryCard extends StatelessWidget {
 
                       CardSubTitle(
                         title: "إجمالي المصروف",
-                        value: "9800",
+                        value: expense.formatAmount,
                         color: AppColors.debt,
                       ),
                     ],
@@ -130,7 +138,7 @@ class SummeryCard extends StatelessWidget {
             ],
           ),
         ],
-      ).paddingAll(AppSizes.m),
+      ).paddingAll(AppSizes.s),
     );
   }
 }
@@ -149,7 +157,7 @@ class CardSubTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
 
       children: [
         Text(

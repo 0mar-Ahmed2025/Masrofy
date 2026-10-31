@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:masrofy/core/extensions/build_context.dart';
 import 'package:masrofy/core/extensions/num_extension.dart';
+import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/routes/app_routes.dart';
 import 'package:masrofy/core/themes/app_colors.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
@@ -35,7 +36,7 @@ class QuickTools extends StatelessWidget {
         'label': "المصاريف",
         'icon': Icons.shopping_bag_rounded,
         'color': AppColors.expense,
-        'route': '',
+        'route': AppRoutes.expensesScreen,
       },
     ];
 
@@ -114,6 +115,6 @@ class QuickTools extends StatelessWidget {
           }).toList(),
         ),
       ],
-    );
+    ).paddingHorizontal(AppSizes.m);
   }
 }

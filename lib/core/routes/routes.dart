@@ -5,7 +5,8 @@ import 'package:masrofy/features/auth/data/repo/auth_repo.dart';
 import 'package:masrofy/features/auth/view/screens/auth_screen.dart';
 import 'package:masrofy/features/debts/view/debts_screen.dart';
 import 'package:masrofy/features/goals/view/golas_screen.dart';
-import 'package:masrofy/features/home/view/screens/home_screen.dart';
+import 'package:masrofy/features/home/view/home_screen.dart';
+import 'package:masrofy/features/home/view/tabs/expenses_tab.dart';
 import 'package:masrofy/features/income/view/income_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -43,6 +44,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.incomeScreen,
         builder: (context, state) => IncomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.expensesScreen,
+        builder: (context, state) => ExpensesTab(),
       ),
     ],
   );

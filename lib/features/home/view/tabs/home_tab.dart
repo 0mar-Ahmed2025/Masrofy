@@ -4,7 +4,7 @@ import 'package:masrofy/core/extensions/build_context.dart';
 import 'package:masrofy/core/extensions/widget_extension.dart';
 import 'package:masrofy/core/themes/app_sizes.dart';
 import 'package:masrofy/core/widgets/custom_app_scaffold.dart';
-import 'package:masrofy/features/home/view/widgets/home_app_bar.dart';
+import 'package:masrofy/features/home/view/widgets/home_appBar.dart';
 import 'package:masrofy/features/home/view/widgets/overview_section.dart';
 import 'package:masrofy/features/home/view/widgets/quick_tools.dart';
 import 'package:masrofy/features/home/view/widgets/summery_card.dart';
@@ -19,16 +19,16 @@ class HomeTab extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const HomeAppBar(),
+            HomeAppBar().paddingAll(AppSizes.s),
             AppSizes.l.verticalSpace,
-            const SummeryCard(),
+            SummeryCard().paddingAll(AppSizes.m),
             AppSizes.l.verticalSpace,
-            const QuickTools(),
+            QuickTools(),
             AppSizes.l.verticalSpace,
-            const OverviewSection(),
+            OverviewSection()
           ],
         ),
-      ).paddingHorizontal(AppSizes.screenPaddingAll),
+      ),
     );
   }
 }
