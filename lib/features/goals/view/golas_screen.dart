@@ -204,6 +204,7 @@ class _GoalsPageState extends ConsumerState<GoalsScreen> {
       } else {
         await controller.updateGoal(newGoal);
       }
+      if (!mounted) return;
       _currentController.clear();
       _titleController.clear();
       _targetController.clear();
