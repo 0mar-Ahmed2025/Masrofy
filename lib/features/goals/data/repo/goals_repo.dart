@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masrofy/core/services/firebase_service.dart';
 import 'package:masrofy/features/goals/data/models/goal_model.dart';
 
-class GoalRepo {
+class GoalsRepo {
   // firestore
   // firebaseauth => user id
   final FirebaseFirestore _firebaseFirestore;
   final FirebaseAuth _firebaseAuth;
 
-  GoalRepo({required FirebaseFirestore firestore, required FirebaseAuth auth})
+  GoalsRepo({required FirebaseFirestore firestore, required FirebaseAuth auth})
     : _firebaseFirestore = firestore,
       _firebaseAuth = auth;
 
@@ -42,8 +42,8 @@ class GoalRepo {
   }
 }
 
-final goalRepositoryProvider = Provider<GoalRepo>(
-  (ref) => GoalRepo(
+final goalRepositoryProvider = Provider<GoalsRepo>(
+  (ref) => GoalsRepo(
     auth: ref.watch(firebaseAuthProvider),
     firestore: ref.watch(firestoreProvider),
   ),
