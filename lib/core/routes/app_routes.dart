@@ -6,5 +6,5 @@ class AppRoutes {
   static const String goalsScreen = '/goalsScreen';
   static const String deptsScreen = '/deptsScreen';
   static const String incomeScreen = '/incomeScreen';
-  static const String expensesScreen = '/incomeScreen';
+  static const String expensesScreen = '/expensesScreen';
 }
